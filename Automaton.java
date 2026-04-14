@@ -54,7 +54,7 @@ public class Automaton
             int left = (i == 0) ? 0: state[i+1];
             int center = state[i];
             int right = (i + 1 < state.length) ? state[i + 1] : 0;
-            nextState[i] = (left + center + right) % 2;
+            nextState[i] = calculateNextState(left, center, right);
         }
         state = nextState;
     }
@@ -80,10 +80,11 @@ public class Automaton
         int[] nextState = new int[state.length];
         for (int i=0; i < state.length; i++){
             int right = i + 1 < state.length ? state[i + 1] : 0;
-            nextState[i] = (left + center + right) % 2;
+            nextState[i] = calculateNextState(left, center, right);
             left = center;
             center = right;
         }
+        state = nextState;
     }
     /**
      * Reset the automaton.
@@ -94,5 +95,27 @@ public class Automaton
         // Seed the automaton with a single 'on' cell.
          state[numberOfCells / 2] = 1;
         state[(numberOfCells / 2) +1 ] = 1;
+    }
+    public int calculateNextState(int left, int center, int right)
+    {
+        return (left + center + right) % 2;
+    }
+    public void updateRE()
+    {
+        int[] nextState = new int[numberOfCells];
+        int left = 0;
+        int center = state[0];
+
+        for (int i = 0; i < numberOfCells; i++) {
+            int right = state[i + 1];
+            nextState[i] = calculateNextState(left, center, right);
+            left = center;
+            center = right;
+        }
+        state = new int[numberOfCells + 1];
+        for (int i = 0; i < numberOfCells; i++) {
+            state[i] = nextState[i];
+        }
+        state[numberOfCells] = 0; // keep extra cell = 0
     }
 }
